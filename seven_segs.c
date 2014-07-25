@@ -34,7 +34,8 @@ uint8_t number_seg_bytes[]  PROGMEM = {
 void init_digit_pins(void){
     
     //setup bits 0-2 in DDRB for output for digits 0-2
-    DDRB |= ALL_DIGS;
+    //DDRB |= ALL_DIGS;
+    DIGIT_DDR |= ALL_DIGS;
 }
 
 void init_segment_pins(void){
@@ -63,9 +64,11 @@ void write_digit(int8_t num, uint8_t dig){
     
     for( k = 0; k < num_digits; k++){
         if ( k == dig ){
-                PORTB |= pgm_read_byte(&digit_bits[k]);
+                //PORTB |= pgm_read_byte(&digit_bits[k]);
+                DIGIT_PORT |= pgm_read_byte(&digit_bits[k]);
         } else {
-                PORTB &= ~(pgm_read_byte(&digit_bits[k]));
+                //PORTB &= ~(pgm_read_byte(&digit_bits[k]));
+                DIGIT_PORT &= ~(pgm_read_byte(&digit_bits[k]));
         }
     }
     _delay_ms(DIGIT_DELAY_MS);

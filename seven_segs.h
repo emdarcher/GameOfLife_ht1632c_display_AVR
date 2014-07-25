@@ -41,6 +41,9 @@ E       C
 #define SEGMENT_DDR DDRA
 #define SEGMENT_PORT PORTA
 
+#define DIGIT_DDR DDRB
+#define DIGIT_PORT PORTB
+
 //these are the bits of a AVR port
 //that go to particular segments
 #define SEG_A (1<<6)
@@ -54,7 +57,7 @@ E       C
 #define ALL_SEGS ( SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G )
 
 //make sure to handle digit selection in software
-
+//set these bits to the bits of the PORT that the digit control will be on
 #define DIG_0 (1<<2)
 #define DIG_1 (1<<1)
 #define DIG_2 (1<<0)
