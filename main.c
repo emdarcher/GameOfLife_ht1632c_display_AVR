@@ -26,7 +26,7 @@
 #define BUTTON_PORT PORTB //PORTx that the button is connected to
 #define BUTTON_PIN PINB //PINx for the port the button is connected to
 
-#define DO_YOU_WANT_BUTTON_INT0 0 //set this if you want to use external
+#define DO_YOU_WANT_BUTTON_INT0 0  //set this if you want to use external
                                     //interrupt INT0 on PB6 for the button.
 
 #define LOW_DIFF_THRESHOLD 42 //threshold of how many generations can pass
@@ -64,6 +64,8 @@ volatile uint8_t timer_overflow_count=0;
 //#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
 static inline void init_button(void);
 
+static inline void init_srand(void);
+
 //void init_timer0(void);
 void init_timer1(void);
 
@@ -77,6 +79,11 @@ int main(void)
     
     //init the ht1632c LED matrix driver chip
     ht1632c_init();
+    
+    //init the ADC
+    init_ADC();
+    
+    init_srand();
     
     //init button stuff for input and pullup
     //and setup INT0 for button if you set DO_YOU_WANT_BUTTON_INT0
@@ -92,7 +99,7 @@ int main(void)
     
     
     //init the ADC
-    init_ADC();
+    //init_ADC();
     
     //reset the display with a "random" array
     reset_grid();
@@ -122,7 +129,7 @@ int main(void)
             update_gen_flag=0;
         }
         //write_number(g_count); //write the g_count to 7 segment displays
-        //write_number(generation_count);
+        write_number(generation_count);
         
         //adc stuff
            //PORTB &= ~(1<<6);
@@ -139,9 +146,9 @@ int main(void)
             //write_number((uint8_t)(adc6_val/64));
         //    write_number(generation_count/64);
             //write_number((uint8_t)(ADC>>2));
-            write_number(ADC/64);
+        //    write_number(ADC/64);
             //_delay_ms(20);
-            ht1632c_bright(ADC/64);
+            //ht1632c_bright(ADC/64);
             //ht1632c_bright((adc6_val/64));
             //ht1632c_bright(adc6_8val/16);
             //write_number(adc6_8val);
@@ -183,6 +190,17 @@ static inline void init_button(void){
     #endif
 }
 
+static inline void init_srand(void){
+    
+    //start adc
+    ADCSR |= (1<<ADSC);
+    
+    loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+    
+    srand(ADCL); //for a pretty random adc reading
+    
+}
+
 void reset_grid(void){
 //resets the framebuffer with "random" values
     //cli();//disable interrupts
@@ -194,11 +212,12 @@ void reset_grid(void){
     //disable pullup on pb6
     //PORTB &= ~(1<<6);
     //start adc
-    ADCSR |= (1<<ADSC);
+    //ADCSR |= (1<<ADSC);
     
-    loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+    //loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
     
-    srand(ADCH); //for a pretty random adc reading
+    //srand(ADCL); //for a pretty random adc reading
+    
     
     uint8_t k;
     for(k=0;k<X_AXIS_LEN;k++){
