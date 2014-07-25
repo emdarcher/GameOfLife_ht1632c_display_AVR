@@ -55,9 +55,9 @@ E       C
 
 //make sure to handle digit selection in software
 
-#define DIG_0 (1<<0)
+#define DIG_0 (1<<2)
 #define DIG_1 (1<<1)
-#define DIG_2 (1<<2)
+#define DIG_2 (1<<0)
 
 //remember to add any newly defines digits here
 #define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 )
@@ -69,6 +69,8 @@ E       C
 //extern const uint8_t digit_bits[];
 
 extern const uint8_t  num_digits;
+
+extern uint8_t seven_seg_error_flag;
 
 void init_digit_pins(void);
 void init_segment_pins(void);

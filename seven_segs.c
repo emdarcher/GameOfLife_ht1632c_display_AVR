@@ -12,6 +12,7 @@
 uint8_t digit_bits[] PROGMEM = { DIG_0, DIG_1, DIG_2 };
 //const uint8_t  num_digits = sizeof(digit_bits)/2;
 const uint8_t num_digits = 3;
+uint8_t seven_seg_error_flag=0;
 
 //const 
 uint8_t number_seg_bytes[]  PROGMEM = {
@@ -73,6 +74,7 @@ void write_digit(int8_t num, uint8_t dig){
 
 void msg_error(void){
     write_digit(10, 0);
+    seven_seg_error_flag=1;
 }
 
 void write_number(int16_t number){
