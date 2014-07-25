@@ -34,32 +34,28 @@
                                 //before reset.
 #define MED_DIFF_THRESHOLD 196 //same as above but for medium difference.
 
-//static uint8_t bright = 0;  /* current LED brightness */
 uint8_t fb[X_AXIS_LEN];      /* framebuffer */
-
 uint8_t state_storage[X_AXIS_LEN]; //area to store pixel states
 
 volatile uint8_t update_gen_flag = 0;
 
+//framebuffer functions
 void clear_fb(void);
-
 void push_fb(void);
 
+//stuff for game of life things
 void get_new_states(void);
 uint8_t get_new_pixel_state(uint8_t in_states[], int8_t x, int8_t y);
 uint8_t get_current_pixel_state(uint8_t in[], int8_t x,int8_t y); 
-
 uint8_t get_difference(uint8_t a[],uint8_t b[]);
 
+//variables to store various difference counts
 uint8_t low_diff_count=0;
 uint8_t old_low_diff_count=0;
-
 uint16_t med_diff_count=0;
 uint16_t old_med_diff_count=0;
 
 volatile uint16_t generation_count=0;
-
-volatile uint8_t timer_overflow_count=0;
 
 //#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
 void init_button(void);
@@ -75,6 +71,7 @@ void set_ht1632_bright_ADC(uint8_t adc_num);
 
 void reset_grid(void);
 
+//main code
 int main(void)
 {
 //init stuff
@@ -100,11 +97,7 @@ int main(void)
     init_digit_pins();
     init_segment_pins();
     
-    
-    //init the ADC
-    //init_ADC();
-    
-    //reset the display with a "random" array
+    //reset the display with a "random" array using rand()
     reset_grid();
     
     //test glider
@@ -114,9 +107,6 @@ int main(void)
     
     //variable to store generation_count for display on 7 segment displays
     uint16_t g_count=0;
-    
-    //uint16_t adc6_val;
-    //uint8_t adc6_8val;
     
     //enable global interrupts
     sei();
@@ -133,6 +123,7 @@ int main(void)
         }
         write_number(g_count); //write the g_count to 7 segment displays
         //write_number(generation_count);
+        
         //if the seven_seg_error flag is set (output is over 999 for 3 digits)
         //then reset the grid 
         if(seven_seg_error_flag){
@@ -151,16 +142,11 @@ void clear_fb(void){
 
 void push_fb(void){
 //pushes frambuffer into the ht1632c chip in the display
-    //uint8_t i=0;
-    //uint8_t j=0;
-    //uint8_t i,j=0;
+    
     uint8_t i=X_AXIS_LEN;
-    //for(i=0;i<X_AXIS_LEN;i++)
     while(i--)
     {
         ht1632c_data8((i*2),fb[i]);
-        //ht1632c_data8(j,fb[i]);
-        //j+=2;
     }
 }
 
@@ -196,7 +182,6 @@ void set_ht1632_bright_ADC(uint8_t adc_num){
     
     ADMUX &= ~(0b11111); //clear bottom part
     ADMUX |= adc_num; //set to read the ADCx where x is adc_num
-    //ADMUX |= 6;
     
     //start conversion
     ADCSR |= (1<<ADSC);
@@ -211,7 +196,6 @@ void set_ht1632_bright_ADC(uint8_t adc_num){
 void reset_grid(void){
 //resets the framebuffer with "random" values
     uint8_t k;
-    //uint8_t
     for(k=0;k<X_AXIS_LEN;k++){
         fb[k] = ((uint8_t)rand() & 0xff);
     }
@@ -274,7 +258,6 @@ void get_new_states(void){
     int8_t x=X_AXIS_LEN;
     while(x--){
         int8_t y=Y_AXIS_LEN;
-        //for(y=0;y<Y_AXIS_LEN;y++){
         while(y--){
             if(get_new_pixel_state(fb, x, y)==1){
                 state_storage[x] |= (1<<y);
@@ -377,25 +360,13 @@ void init_timer1(void){
 void init_ADC(void){
     //init the ADC
     
-    //set to use AVCC as reference
-    //ADMUX &= ~((1<<REFS1)|(1<<REFS0));
-    //ADMUX |= 1<<REFS1;
-    //ADMUX |= 1<<ADLAR;//left adj
-    //use ADC6 input 
-    //ADMUX |= ((1<<MUX2)|(1<<MUX1));
-    //ADMUX |= 9;
-    
-    DDRA &= ~(1<<7);
-    PORTA &= ~(1<<7);
+    DDRA &= ~(1<<7);//make sure it is set to input on PA7
+    PORTA &= ~(1<<7);//make sure there are no pullups 
     //set clock prescaler to div 16
     ADCSR |= (1<<ADPS2);
     
-    //ADCSR |= 1<<ADFR;
-    
     //enable the ADC
     ADCSR |= (1<<ADEN);
-    
-    //ADCSR |= (1<<ADSC);
 }
 
 //----ISRs-----
@@ -417,7 +388,7 @@ ISR(TIMER1_OVF1_vect){
         //with the new generation count
         update_gen_flag=1;
 
-        //adc stuff
+        //adc stuff to control pwm
         set_ht1632_bright_ADC(6);
 }
 
