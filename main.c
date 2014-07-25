@@ -34,6 +34,10 @@
                                 //before reset.
 #define MED_DIFF_THRESHOLD 196 //same as above but for medium difference.
 
+#define DO_YOU_WANT_ADC6_INPUT_TO_HT1632C_PWM 1 //set this to "1" if you
+                                //want the ADC6 input used for adjusting
+                                //the PWM/brightness setting of the ht1632c
+
 uint8_t fb[X_AXIS_LEN];      /* framebuffer */
 uint8_t state_storage[X_AXIS_LEN]; //area to store pixel states
 
@@ -129,7 +133,7 @@ int main(void)
         if(seven_seg_error_flag){
             reset_grid();
         }
-        }
+    }
 }
 
 void clear_fb(void){
@@ -387,9 +391,16 @@ ISR(TIMER1_OVF1_vect){
         //in the main while(1) loop, so it will update the 7 segment display
         //with the new generation count
         update_gen_flag=1;
-
+        
+        
+        #if DO_YOU_WANT_ADC6_INPUT_TO_HT1632C_PWM
+        //if you set the DO_YOU_WANT_ADC6_INPUT_TO_HT1632C_PWM to "1"
+        //then this below code will compile
+        
         //adc stuff to control pwm
         set_ht1632_bright_ADC(6);
+        
+        #endif //end of this little snippet
 }
 
 
