@@ -71,6 +71,8 @@ void init_timer1(void);
 
 static inline void init_ADC(void);
 
+void set_ht1632_bright_ADC(uint8_t adc_num);
+
 void reset_grid(void);
 
 int main(void)
@@ -87,7 +89,7 @@ int main(void)
     
     //init button stuff for input and pullup
     //and setup INT0 for button if you set DO_YOU_WANT_BUTTON_INT0
-    init_button();
+    //init_button();
     
     //init timer1 for use in triggering an interrupt
     //on overflow, which updates the display and calculates new generation.
@@ -134,9 +136,9 @@ int main(void)
         //adc stuff
            //PORTB &= ~(1<<6);
             //start conversion
-            ADCSR |= (1<<ADSC);
+            //ADCSR |= (1<<ADSC);
             
-            loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+            //loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
             //while(ADCSR & (1<<ADSC));
             //store value from high and low
             //adc6_val = (uint16_t)((ADCH<<8)|(ADCL));
@@ -176,9 +178,9 @@ void push_fb(void){
 
 static inline void init_button(void){
     //setup for input
-    //BUTTON_DDR &= ~(1<<BUTTON_BIT);
+    BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
-   // BUTTON_PORT |= (1<<BUTTON_BIT);
+    BUTTON_PORT |= (1<<BUTTON_BIT);
     
     #if DO_YOU_WANT_BUTTON_INT0
     //if you want the button to use INT0 for button on PB6
@@ -198,6 +200,24 @@ static inline void init_srand(void){
     loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
     
     srand(ADCL); //for a pretty random adc reading
+    
+}
+
+void set_ht1632_bright_ADC(uint8_t adc_num){
+    uint8_t temp_reg = ADMUX; //save current state
+    
+    ADMUX &= ~(0b11111); //clear bottom part
+    ADMUX |= adc_num; //set to read the ADCx where x is adc_num
+    
+    
+    //start conversion
+    ADCSR |= (1<<ADSC);
+    
+    loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+    
+    ht1632c_bright(ADC/64);
+    
+    ADMUX = temp_reg; //reset ADMUX to original state
     
 }
 
@@ -444,7 +464,8 @@ ISR(TIMER1_OVF1_vect){
             //ht1632c_bright((adc6_val/64));
             //ht1632c_bright(adc6_8val/16);
             //ht1632c_bright((ADCL/16));
-        
+            //ht1632c_bright(ADC/64);
+        set_ht1632_bright_ADC(9);
 }
 
 
