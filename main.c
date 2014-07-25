@@ -26,7 +26,7 @@
 #define BUTTON_PORT PORTB //PORTx that the button is connected to
 #define BUTTON_PIN PINB //PINx for the port the button is connected to
 
-#define DO_YOU_WANT_BUTTON_INT0 0  //set this if you want to use external
+#define DO_YOU_WANT_BUTTON_INT0 1  //set this if you want to use external
                                     //interrupt INT0 on PB6 for the button.
 
 #define LOW_DIFF_THRESHOLD 42 //threshold of how many generations can pass
@@ -89,7 +89,7 @@ int main(void)
     
     //init button stuff for input and pullup
     //and setup INT0 for button if you set DO_YOU_WANT_BUTTON_INT0
-    //init_button();
+    init_button();
     
     //init timer1 for use in triggering an interrupt
     //on overflow, which updates the display and calculates new generation.
@@ -216,7 +216,7 @@ void set_ht1632_bright_ADC(uint8_t adc_num){
     loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
     
     ht1632c_bright(ADC/64);
-    
+    //generation_count=ADC/64;
     ADMUX = temp_reg; //reset ADMUX to original state
     
 }
@@ -417,8 +417,8 @@ static inline void init_ADC(void){
     //ADMUX |= ((1<<MUX2)|(1<<MUX1));
     ADMUX |= 9;
     
-    //DDRA &= ~(1<<7);
-    //PORTA &= ~(1<<7);
+    DDRA &= ~(1<<7);
+    PORTA &= ~(1<<7);
     //set clock prescaler to div 16
     ADCSR |= (1<<ADPS2);
     
@@ -465,7 +465,7 @@ ISR(TIMER1_OVF1_vect){
             //ht1632c_bright(adc6_8val/16);
             //ht1632c_bright((ADCL/16));
             //ht1632c_bright(ADC/64);
-        set_ht1632_bright_ADC(9);
+        set_ht1632_bright_ADC(6);
 }
 
 

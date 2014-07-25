@@ -78,7 +78,7 @@ void msg_error(void);
 void write_number(int16_t number);
 void write_digit(int8_t num, uint8_t dig);
 
-//void write_segs(uint8_t byte);
+void write_segs(uint8_t byte);
 
 
 #endif

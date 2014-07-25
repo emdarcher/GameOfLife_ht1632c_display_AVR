@@ -57,8 +57,8 @@ void write_digit(int8_t num, uint8_t dig){
     
     //output the byte to the port, shift right 1 bit to correctly
     //use the values from number_seg_bytes.
-    //write_segs((out_byte>>1));
-    SEGMENT_PORT = (out_byte>>1);
+    write_segs((out_byte>>1));
+    //SEGMENT_PORT = (out_byte>>1);
     
     for( k = 0; k < num_digits; k++){
         if ( k == dig ){
@@ -90,15 +90,16 @@ void write_number(int16_t number){
         }
 }
 
-
+//this is so we avoid writing to PORTA bit 7, which is connected to the
+//ADC for brightness control.
 void write_segs(uint8_t byte){
-    uint8_t o;
-    for(o=0;o<7;o++){
-    if(byte & (1<<o)){
-    SEGMENT_PORT |= (1<<o);
-    }
-    else{
-    SEGMENT_PORT &= ~(1<<o);
-    }
+    uint8_t o=7;
+    while(o--){
+        if(byte & (1<<o)){
+            SEGMENT_PORT |= (1<<o);
+        }
+        else{
+            SEGMENT_PORT &= ~(1<<o);
+        }
     }
 }
