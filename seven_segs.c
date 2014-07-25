@@ -58,7 +58,7 @@ void write_digit(int8_t num, uint8_t dig){
     //output the byte to the port, shift right 1 bit to correctly
     //use the values from number_seg_bytes.
     //write_segs((out_byte>>1));
-    SEGMENT_PORT |= (out_byte>>1);
+    SEGMENT_PORT = (out_byte>>1);
     
     for( k = 0; k < num_digits; k++){
         if ( k == dig ){

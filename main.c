@@ -26,7 +26,7 @@
 #define BUTTON_PORT PORTB //PORTx that the button is connected to
 #define BUTTON_PIN PINB //PINx for the port the button is connected to
 
-#define DO_YOU_WANT_BUTTON_INT0 1 //set this if you want to use external
+#define DO_YOU_WANT_BUTTON_INT0 0 //set this if you want to use external
                                     //interrupt INT0 on PB6 for the button.
 
 #define LOW_DIFF_THRESHOLD 42 //threshold of how many generations can pass
@@ -121,15 +121,15 @@ int main(void)
             g_count = generation_count;
             update_gen_flag=0;
         }
-        write_number(g_count); //write the g_count to 7 segment displays
+        //write_number(g_count); //write the g_count to 7 segment displays
         //write_number(generation_count);
         
         //adc stuff
-           // PORTB &= ~(1<<6);
+           //PORTB &= ~(1<<6);
             //start conversion
-            //ADCSR |= (1<<ADSC);
+            ADCSR |= (1<<ADSC);
             
-            //loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+            loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
             //while(ADCSR & (1<<ADSC));
             //store value from high and low
             //adc6_val = (uint16_t)((ADCH<<8)|(ADCL));
@@ -139,10 +139,13 @@ int main(void)
             //write_number((uint8_t)(adc6_val/64));
         //    write_number(generation_count/64);
             //write_number((uint8_t)(ADC>>2));
-            //write_number(ADCH);
+            write_number(ADC/64);
             //_delay_ms(20);
+            ht1632c_bright(ADC/64);
             //ht1632c_bright((adc6_val/64));
             //ht1632c_bright(adc6_8val/16);
+            //write_number(adc6_8val);
+            //PORTB |= (1<<6);
     }
 }
 
@@ -165,10 +168,10 @@ void push_fb(void){
 }
 
 static inline void init_button(void){
-    //setup for output
-    BUTTON_DDR &= ~(1<<BUTTON_BIT);
+    //setup for input
+    //BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
-    BUTTON_PORT |= (1<<BUTTON_BIT);
+   // BUTTON_PORT |= (1<<BUTTON_BIT);
     
     #if DO_YOU_WANT_BUTTON_INT0
     //if you want the button to use INT0 for button on PB6
@@ -184,18 +187,18 @@ void reset_grid(void){
 //resets the framebuffer with "random" values
     //cli();//disable interrupts
     
-    while(!(PINB & (1<<6)));//wait until released
+    //while(!(PINB & (1<<6)));//wait until released
     
     //_delay_ms(10);//a little wait
     
     //disable pullup on pb6
-    PORTB &= ~(1<<6);
+    //PORTB &= ~(1<<6);
     //start adc
     ADCSR |= (1<<ADSC);
     
     loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
     
-    srand(ADC); //for a pretty random adc reading
+    srand(ADCH); //for a pretty random adc reading
     
     uint8_t k;
     for(k=0;k<X_AXIS_LEN;k++){
@@ -204,7 +207,7 @@ void reset_grid(void){
     generation_count=0;
     
     //reenable pullup
-    PORTB |= (1<<6);
+    //PORTB |= (1<<6);
     //sei();
 }
 
@@ -294,7 +297,7 @@ void get_new_states(void){
             med_diff_count--;
         }
     }
-    
+    /*
     #if DO_YOU_WANT_BUTTON_INT0==0
     //if you don't want to use INT0 for button
     //then this "if" statement will compile
@@ -304,7 +307,7 @@ void get_new_states(void){
         reset_grid();
     } 
     else 
-    #endif
+    #endif*/
     if(low_diff_count > LOW_DIFF_THRESHOLD){
     //if low_diff_count is above threshold, reset
         low_diff_count=0;
