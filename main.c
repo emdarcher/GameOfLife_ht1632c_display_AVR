@@ -62,10 +62,12 @@ volatile uint16_t generation_count=0;
 volatile uint8_t timer_overflow_count=0;
 
 //#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
-void init_button(void);
+static inline void init_button(void);
 
 //void init_timer0(void);
 void init_timer1(void);
+
+static inline void init_ADC(void);
 
 void reset_grid(void);
 
@@ -88,6 +90,10 @@ int main(void)
     init_digit_pins();
     init_segment_pins();
     
+    
+    //init the ADC
+    init_ADC();
+    
     //reset the display with a "random" array
     reset_grid();
     
@@ -98,6 +104,9 @@ int main(void)
     
     //variable to store generation_count for display on 7 segment displays
     uint16_t g_count=0;
+    
+    uint16_t adc6_val;
+    uint8_t adc6_8val;
     
     //enable global interrupts
     sei();
@@ -114,6 +123,26 @@ int main(void)
         }
         write_number(g_count); //write the g_count to 7 segment displays
         //write_number(generation_count);
+        
+        //adc stuff
+           // PORTB &= ~(1<<6);
+            //start conversion
+            //ADCSR |= (1<<ADSC);
+            
+            //loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+            //while(ADCSR & (1<<ADSC));
+            //store value from high and low
+            //adc6_val = (uint16_t)((ADCH<<8)|(ADCL));
+            //adc6_8val = ADCL;
+            //adc6_8val = ADCH;
+            //adc6_8val = (uint8_t)(ADC>>2);
+            //write_number((uint8_t)(adc6_val/64));
+        //    write_number(generation_count/64);
+            //write_number((uint8_t)(ADC>>2));
+            //write_number(ADCH);
+            //_delay_ms(20);
+            //ht1632c_bright((adc6_val/64));
+            //ht1632c_bright(adc6_8val/16);
     }
 }
 
@@ -135,7 +164,7 @@ void push_fb(void){
     }
 }
 
-void init_button(void){
+static inline void init_button(void){
     //setup for output
     BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
@@ -153,11 +182,30 @@ void init_button(void){
 
 void reset_grid(void){
 //resets the framebuffer with "random" values
+    //cli();//disable interrupts
+    
+    while(!(PINB & (1<<6)));//wait until released
+    
+    //_delay_ms(10);//a little wait
+    
+    //disable pullup on pb6
+    PORTB &= ~(1<<6);
+    //start adc
+    ADCSR |= (1<<ADSC);
+    
+    loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+    
+    srand(ADC); //for a pretty random adc reading
+    
     uint8_t k;
     for(k=0;k<X_AXIS_LEN;k++){
         fb[k] = ((uint8_t)rand() & 0xff);
     }
     generation_count=0;
+    
+    //reenable pullup
+    PORTB |= (1<<6);
+    //sei();
 }
 
 uint8_t get_current_pixel_state(uint8_t in[], int8_t x,int8_t y){
@@ -316,6 +364,30 @@ void init_timer1(void){
     TIMSK |= (1<<TOIE1);
 }
 
+static inline void init_ADC(void){
+    //init the ADC
+    
+    //set to use AVCC as reference
+    //ADMUX &= ~((1<<REFS1)|(1<<REFS0));
+    //ADMUX |= 1<<REFS1;
+    //ADMUX |= 1<<ADLAR;//left adj
+    //use ADC6 input 
+    //ADMUX |= ((1<<MUX2)|(1<<MUX1));
+    ADMUX |= 9;
+    
+    //DDRA &= ~(1<<7);
+    //PORTA &= ~(1<<7);
+    //set clock prescaler to div 16
+    ADCSR |= (1<<ADPS2);
+    
+    //ADCSR |= 1<<ADFR;
+    
+    //enable the ADC
+    ADCSR |= (1<<ADEN);
+    
+    //ADCSR |= (1<<ADSC);
+}
+
 //----ISRs-----
 
 
@@ -334,6 +406,23 @@ ISR(TIMER1_OVF1_vect){
         //in the main while(1) loop, so it will update the 7 segment display
         //with the new generation count
         update_gen_flag=1;
+
+        //adc stuff
+            //start conversion
+            //ADCSR |= (1<<ADSC);
+            
+            //loop_until_bit_is_clear(ADCSR, ADSC);//wait until done
+            
+            //store value from high and low
+            //adc6_val = (uint16_t)((ADCH<<8)|(ADCL));
+            //adc6_8val = ADCL;
+            //generation_count = ADCH;
+            
+            
+            //ht1632c_bright((adc6_val/64));
+            //ht1632c_bright(adc6_8val/16);
+            //ht1632c_bright((ADCL/16));
+        
 }
 
 

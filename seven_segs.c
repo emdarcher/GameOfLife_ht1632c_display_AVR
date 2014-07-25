@@ -55,9 +55,10 @@ void write_digit(int8_t num, uint8_t dig){
     out_byte = pgm_read_byte(&number_seg_bytes[10]);
     }
     
-    //output the byte to the port, shit right 1 bit to correctly
+    //output the byte to the port, shift right 1 bit to correctly
     //use the values from number_seg_bytes.
-    SEGMENT_PORT = (out_byte>>1);
+    //write_segs((out_byte>>1));
+    SEGMENT_PORT |= (out_byte>>1);
     
     for( k = 0; k < num_digits; k++){
         if ( k == dig ){
@@ -89,10 +90,10 @@ void write_number(int16_t number){
         }
 }
 
-/*
+
 void write_segs(uint8_t byte){
     uint8_t o;
-    for(o=0;o<8;o++){
+    for(o=0;o<7;o++){
     if(byte & (1<<o)){
     SEGMENT_PORT |= (1<<o);
     }
@@ -100,4 +101,4 @@ void write_segs(uint8_t byte){
     SEGMENT_PORT &= ~(1<<o);
     }
     }
-}*/
+}
