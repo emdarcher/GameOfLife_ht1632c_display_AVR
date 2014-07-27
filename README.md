@@ -15,4 +15,8 @@ ADDITIONAL FEATURES:
     
   * If using INT0 for the button on PB6, and the ADC6 input on PA7, the code compiles to **exactly 2048 bytes!**. This isn't exactly a feature but is pretty interesting (the ATtiny26 only has 2048 bytes of flash! So be careful with changes to the code, or it may compile to be too big to fit in the ATtiny26! If unsure, type `make size` using the included Makefile to find out flash and ram usage). This may change later if I put some constants into EEPROM instead of PROGMEM (flash), but reads from EEPROM are slower than flash, so I probably won't change that unless I have to. The code can surely be better optimized ( I did as much as I could ), so feel free to do so. (compiler flags were a miracle as well, the `--combine -fwhole-program` gcc flags helped shave off many bytes!)
 
+Now has been soldered on protoboard pcb!
+
+Project has been posted on [Hackaday Projects](http://hackaday.io/project/2048-GameOfLife_ht1632c_display_AVR)!
+
 Original development and testing of the code had been done within my [driving_ht1632c_AVR](https://github.com/emdarcher/driving_ht1632c_AVR) repository.
