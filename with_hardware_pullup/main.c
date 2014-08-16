@@ -26,6 +26,8 @@
 #define BUTTON_PORT PORTB //PORTx that the button is connected to
 #define BUTTON_PIN PINB //PINx for the port the button is connected to
 
+#define DO_YOU_WANT_A_GENERATION_RESET_BUTTON 0 //do you want a generation reset button at all
+
 #define DO_YOU_WANT_BUTTON_INT0 1  //set this if you want to use external
                                     //interrupt INT0 on PB6 for the button.
 
@@ -157,6 +159,8 @@ void push_fb(void){
 void init_button(void){
     //setup for input
     BUTTON_DDR &= ~(1<<BUTTON_BIT);
+    
+    #if DO_YOU_WANT_A_GENERATION_RESET_BUTTON==1
     //enable pullup
     BUTTON_PORT |= (1<<BUTTON_BIT);
     
@@ -167,6 +171,7 @@ void init_button(void){
         MCUCR |= (1<<ISC01);
         //enable the INT0 external interrupt
         GIMSK |= (1<<INT0);
+    #endif
     #endif
 }
 
@@ -291,7 +296,7 @@ void get_new_states(void){
             med_diff_count--;
         }
     }
-    
+    #if DO_YOU_WANT_A_GENERATION_RESET_BUTTON==1
     #if DO_YOU_WANT_BUTTON_INT0==0
     //if you don't want to use INT0 for button
     //then this "if" statement will compile
@@ -301,6 +306,7 @@ void get_new_states(void){
         reset_grid();
     } 
     else 
+    #endif
     #endif
     if(low_diff_count > LOW_DIFF_THRESHOLD){
     //if low_diff_count is above threshold, reset
@@ -403,7 +409,7 @@ ISR(TIMER1_OVF1_vect){
         #endif //end of this little snippet
 }
 
-
+#if DO_YOU_WANT_A_GENERATION_RESET_BUTTON==1
 #if DO_YOU_WANT_BUTTON_INT0
 //if you want a button to use INT0 for button on PB6
 
@@ -414,5 +420,7 @@ ISR(INT0_vect){
     //reset and "randomize"
     reset_grid();
 }
+
+#endif
 
 #endif
