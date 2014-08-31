@@ -14,6 +14,7 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
 
 #include "ht1632c.h"
 #include "seven_segs.h"
@@ -25,6 +26,8 @@
 #define BUTTON_DDR DDRB //DDRx for BUTTON_PORT
 #define BUTTON_PORT PORTB //PORTx that the button is connected to
 #define BUTTON_PIN PINB //PINx for the port the button is connected to
+
+#define DO_YOU_WANT_TO_USE_WATCHDOG 1 //set if you want to use watchdog
 
 #define DO_YOU_WANT_A_GENERATION_RESET_BUTTON 0 //do you want a generation reset button at all
 
@@ -114,6 +117,11 @@ int main(void)
     //variable to store generation_count for display on 7 segment displays
     uint16_t g_count=0;
     
+    #if DO_YOU_WANT_TO_USE_WATCHDOG==1
+    //setup watchdog
+    wdt_enable(WDTO_1S);
+    #endif
+    
     //enable global interrupts
     sei();
     
@@ -135,6 +143,12 @@ int main(void)
         if(seven_seg_error_flag){
             reset_grid();
         }
+        
+        #if DO_YOU_WANT_TO_USE_WATCHDOG==1
+        //reset watchdog
+        wdt_reset();
+        #endif
+        
     }
 }
 
