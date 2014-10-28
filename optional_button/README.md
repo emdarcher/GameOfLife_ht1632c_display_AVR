@@ -4,7 +4,17 @@ GameOfLife_ht1632c_display_AVR
 
 Code for to display Conway's Game of Life on a ht1632c-based 32x8 LED matrix board, controlled by an AVR ATtiny26 microcontroller. The extra I/O pins on the ATtiny26 are used to control 3 multiplexed seven-segment displays to show the generation count. The code has counters of generations that have low differences, and when it reaches a threshold it resets the display with a new "random" pattern. This is to keep it interesting, and to prevent oscillators from staying indefinitely and preventing reset. 
 
-ADDITIONAL FEATURES:
+
+Now has been soldered on protoboard pcb!
+
+Project has been posted on [Hackaday Projects](http://hackaday.io/project/2048-GameOfLife_ht1632c_display_AVR)!
+
+See other code revisions in the different branches.
+
+Original development and testing of the code had been done within my [driving_ht1632c_AVR](https://github.com/emdarcher/driving_ht1632c_AVR) repository.
+
+
+REV1 FEATURES:
 ---------------------
 
   * There is a button connected to PB6 of the ATtiny26, which triggers external interrupt INT0 which can reset the display if the spectator desires to do so. Using this button with INT0 is optional, and can be disabled by clearing `DO_YOU_WANT_BUTTON_INT0` to `0` in `main.c` before compiling.
@@ -15,8 +25,4 @@ ADDITIONAL FEATURES:
     
   * If using INT0 for the button on PB6, and the ADC6 input on PA7, the code compiles to **exactly 2048 bytes!**. This isn't exactly a feature but is pretty interesting (the ATtiny26 only has 2048 bytes of flash! So be careful with changes to the code, or it may compile to be too big to fit in the ATtiny26! If unsure, type `make size` using the included Makefile to find out flash and ram usage). This may change later if I put some constants into EEPROM instead of PROGMEM (flash), but reads from EEPROM are slower than flash, so I probably won't change that unless I have to. The code can surely be better optimized ( I did as much as I could ), so feel free to do so. (compiler flags were a miracle as well, the `--combine -fwhole-program` gcc flags helped shave off many bytes!). NOTE: interesting coincidence, based on my link on [Hackaday Projects](http://hackaday.io/project/2048-GameOfLife_ht1632c_display_AVR), my project is number 2048! Very interesting indeed!
 
-Now has been soldered on protoboard pcb!
 
-Project has been posted on [Hackaday Projects](http://hackaday.io/project/2048-GameOfLife_ht1632c_display_AVR)!
-
-Original development and testing of the code had been done within my [driving_ht1632c_AVR](https://github.com/emdarcher/driving_ht1632c_AVR) repository.
