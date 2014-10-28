@@ -13,6 +13,12 @@ See other code revisions in the different branches.
 
 Original development and testing of the code had been done within my [driving_ht1632c_AVR](https://github.com/emdarcher/driving_ht1632c_AVR) repository.
 
+DEVELOPMENT:
+------------
+  - Complete redo and cleanup of code.
+  - Optimize for space and speed better.
+  - Try to fix the mysterious crashing bug that even the watchdog can't seem to prevent.
+  - other things as they come.
 
 REV1 FEATURES:
 ---------------------
