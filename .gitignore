@@ -6,3 +6,8 @@
 *.out
 *.srec
 *.ihex
+*.lst
+*.obj
+*.eep
+*.dump
+*.d
