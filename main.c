@@ -163,8 +163,7 @@ void push_fb(void){
 //pushes frambuffer into the ht1632c chip in the display
     
     uint8_t i=X_AXIS_LEN;
-    while(i--)
-    {
+    while(i--){
         ht1632c_data8((i*2),fb[i]);
     }
 }
