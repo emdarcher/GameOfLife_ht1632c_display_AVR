@@ -302,10 +302,10 @@ static inline void get_new_states(void){
     else{
         //if neither, then decrement their counters to stay longer before reset
         if(low_diff_count > 0){
-            low_diff_count--;
+            --low_diff_count;
         }
         if(med_diff_count >0){
-            med_diff_count--;
+            --med_diff_count;
         }
     }
     #if DO_YOU_WANT_A_GENERATION_RESET_BUTTON==1
