@@ -1,4 +1,4 @@
-//my small little library for driving multiplexed seven segment displays
+//my :small little library for driving multiplexed seven segment displays
 
 //the functions
 
@@ -9,7 +9,9 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 
+#if USE_DIG_BIT_ARRAY==1
 uint8_t digit_bits[] PROGMEM = { DIG_0, DIG_1, DIG_2 };
+#endif
 //const uint8_t  num_digits = sizeof(digit_bits)/2;
 const uint8_t num_digits = 3;
 uint8_t seven_seg_error_flag=0;
@@ -59,16 +61,24 @@ void write_digit(int8_t num, uint8_t dig){
     
     //output the byte to the port, shift right 1 bit to correctly
     //use the values from number_seg_bytes.
-    write_segs((out_byte>>1));
-    //SEGMENT_PORT = (out_byte>>1);
+    //write_segs((out_byte>>1));
+    SEGMENT_PORT = (out_byte>>1);
     
     for( k = 0; k < num_digits; k++){
         if ( k == dig ){
                 //PORTB |= pgm_read_byte(&digit_bits[k]);
+                #if USE_DIG_BIT_ARRAY==1
                 DIGIT_PORT |= pgm_read_byte(&digit_bits[k]);
+                #else
+                DIGIT_PORT |= (DIG_0 >> k); 
+                #endif
         } else {
                 //PORTB &= ~(pgm_read_byte(&digit_bits[k]));
+                #if USE_DIG_BIT_ARRAY==1
                 DIGIT_PORT &= ~(pgm_read_byte(&digit_bits[k]));
+                #else
+                DIGIT_PORT &= ~(DIG_0 >> k);
+                #endif
         }
     }
     _delay_ms(DIGIT_DELAY_MS);
@@ -83,17 +93,49 @@ void msg_error(void){
 void write_number(int16_t number){
         uint8_t h;
         int16_t format_num = number;
-        //check if number is too big ot not
-        if ((number < 1000) && (number >= 0)){
+        #if 1//check if number is too big ot not
+        //if (number > 999){ format_num = 999;}
+        if (!((number < 1000) && (number >= 0))){
+            format_num = 999;
+        }
             //formats number based on digits to correct digits on display
             for(h=0;h < num_digits;h++){
                 write_digit(format_num % 10, h);
                 format_num /= 10;
             }         
-        } else {
-            msg_error();
-        }
+        //} 
+        //else {
+           // msg_error();
+        //}
+        #endif
+    #if 0
+    uint8_t d_nums[3];
+    d_nums[2] = number / 100;
+    number -= d_nums[2] * 100;
+    d_nums[1] = number / 10;
+    number -= d_nums[1] * 10;
+    d_nums[0] = number;
+    for(h=0;h<num_digits;h++){
+        write_digit(d_nums[h],h);
+    }
+    #endif
+    #if 0
+    uint8_t msd,nsd,lsd;
+    msd = number / 100;
+    number -= msd * 100;
+    write_digit(msd,2);
+    nsd = number / 10;
+    number -= nsd * 10;
+    write_digit(nsd,1);
+    lsd = number;
+    write_digit(lsd,0);
+    /*for(h=0;h<num_digits;h++){
+        write_digit(d_nums[h],h);
+    }*/
+    #endif
+
 }
+
 
 //this is so we avoid writing to PORTA bit 7, which is connected to the
 //ADC for brightness control.

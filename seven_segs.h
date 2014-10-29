@@ -62,10 +62,15 @@ E       C
 #define DIG_1 (1<<1)
 #define DIG_2 (1<<0)
 
+//this tells the compiler wether to use a progmem array of to store
+//the digit bit values, or not. If your digit pin bits are not in order
+//or next to each other, then use the array option for safety.
+#define USE_DIG_BIT_ARRAY 1 
+
 //remember to add any newly defines digits here
 #define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 )
 
-#define INIT_SEGMENT_PINS SEGMENT_DDR |= ALL_SEGS
+//#define INIT_SEGMENT_PINS SEGMENT_DDR |= ALL_SEGS
 
 #define DIGIT_DELAY_MS 1 //ms to wait before switching to next digit
 
@@ -75,15 +80,15 @@ extern const uint8_t  num_digits;
 
 extern uint8_t seven_seg_error_flag;
 
-void init_digit_pins(void);
-void init_segment_pins(void);
+extern inline void init_digit_pins(void);
+extern inline void init_segment_pins(void);
 
-void msg_error(void);
+extern inline void msg_error(void);
 
-void write_number(int16_t number);
-void write_digit(int8_t num, uint8_t dig);
+extern inline void write_number(int16_t number);
+extern inline void write_digit(int8_t num, uint8_t dig);
 
-void write_segs(uint8_t byte);
+extern inline void write_segs(uint8_t byte);
 
 
 #endif
