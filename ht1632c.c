@@ -19,19 +19,13 @@
 */
 #define BIT_SLEEP do { } while(0)
 
-static 
-inline
-void
-ht1632c_start(void)
-{
+static inline void ht1632c_start(void) __attribute__((always_inline)); 
+static inline void ht1632c_start(void){
     BIT_SLEEP;
     HT1632C_PORT &= ~ HT1632C_CS;
 }
-
-static
-inline 
-void
-ht1632c_stop(void)
+static inline void ht1632c_stop(void) __attribute__((always_inline));
+static inline void ht1632c_stop(void)
 {
     BIT_SLEEP;
     HT1632C_PORT |= HT1632C_CS;
@@ -94,19 +88,19 @@ void
 ht1632c_blinkonoff(uint8_t val){
     ht1632c_cmd(0x08 | !!val); /* 0000-1000-X and 0000-1001-X */
 }
-
+//inline
 void
 ht1632c_slave(uint8_t val){
     val = val ? 0x04 : 0;
     ht1632c_cmd(0x10 | val ); /* 0001-00XX-X and 0001-01XX-X */
 }
-
+//inline
 void
 ht1632c_clock(uint8_t val){
     val = val ? 0x04 : 0;
     ht1632c_cmd(0x18 | val ); /* 0001-10XX-X and 0001-11XX-X */
 }
-
+//inline 
 void
 ht1632c_opts(uint8_t val){
     val = (val & 0x03) << 2;
