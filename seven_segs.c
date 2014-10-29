@@ -1,4 +1,4 @@
-//my :small little library for driving multiplexed seven segment displays
+//my small little library for driving multiplexed seven segment displays
 
 //the functions
 
