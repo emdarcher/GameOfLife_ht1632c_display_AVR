@@ -69,13 +69,11 @@ volatile uint16_t generation_count=0;
 //#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
 static inline void init_button(void);
 
-void init_srand(void);
+static inline void init_srand(void);
 
 //void init_timer0(void);
 static inline void init_timer1(void);
-
 static inline void init_ADC(void);
-
 static inline void set_ht1632_bright_ADC(uint8_t adc_num);
 
 void reset_grid(void);
@@ -160,11 +158,11 @@ void clear_fb(void){
 }
 
 void push_fb(void){
-//pushes frambuffer into the ht1632c chip in the display
-    
+//pushes frambuffer into the ht1632c chip in the display 
     uint8_t i=X_AXIS_LEN;
     while(i--){
-        ht1632c_data8((i*2),fb[i]);
+        //ht1632c_data8((i*2),fb[i]);
+        ht1632c_data8((i<<1),fb[i]);
     }
 }
 
@@ -340,18 +338,14 @@ static inline void get_new_states(void){
     }
 }
 
-uint8_t get_difference(uint8_t a[],uint8_t b[])
-{//gets the amount of differences between two generations
+uint8_t get_difference(uint8_t a[],uint8_t b[]){
+//gets the amount of differences between two generations
     uint8_t x_v,y_v,diff=0;
-
-    for(x_v=0; x_v < X_AXIS_LEN; x_v++)
-    {
-        for(y_v=0; y_v < Y_AXIS_LEN; y_v++)
-        {
+    for(x_v=0; x_v < X_AXIS_LEN; x_v++){
+        for(y_v=0; y_v < Y_AXIS_LEN; y_v++){
             //if changed from 0 to 1 or vise-versa, then increment the difference value
             if(( (get_current_pixel_state(a,x_v,y_v)==1) && (get_current_pixel_state(b,x_v,y_v) == 0)) 
-            || ((get_current_pixel_state(a,x_v,y_v)==0) && (get_current_pixel_state(b,x_v,y_v)==1)))
-            {
+            || ((get_current_pixel_state(a,x_v,y_v)==0) && (get_current_pixel_state(b,x_v,y_v)==1))) {
                 diff++;
             }
         }
@@ -369,7 +363,7 @@ void init_timer0(void){
 }*/
 
 static inline void init_timer1(void){
-
+//init timer 1
     //set prescaler to CK/16384
     //with 8MHz clock, and 8bit timer/counter1
     //this prescaler should make it overflow every 0.52224 seconds
@@ -380,13 +374,11 @@ static inline void init_timer1(void){
 }
 
 static inline void init_ADC(void){
-    //init the ADC
-    
+    //init the ADC 
     DDRA &= ~(1<<7);//make sure it is set to input on PA7
     PORTA &= ~(1<<7);//make sure there are no pullups 
     //set clock prescaler to div 16
     ADCSR |= (1<<ADPS2);
-    
     //enable the ADC
     ADCSR |= (1<<ADEN);
 }
